@@ -43,4 +43,7 @@ const resolve = (resolvers, options = {}) => ({
   }
 });
 
+const virtual = (resolver) => (_, obj, context) => resolver(obj, context);
+
 exports.resolve = resolve;
+exports.virtual = virtual;

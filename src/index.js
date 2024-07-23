@@ -1,4 +1,4 @@
-export const resolve = (resolvers, options = {}) => ({
+const resolve = (resolvers, options = {}) => ({
   resolve: async (obj, context) => {
     if (Object.keys(resolvers).length === 0) return obj;
 
@@ -40,3 +40,7 @@ export const resolve = (resolvers, options = {}) => ({
     return Array.isArray(obj) ? Promise.all(obj.map(processResolver)) : processResolver(obj);
   }
 });
+
+const virtual = (resolver) => (_, obj, context) => resolver(obj, context);
+
+export { resolve, virtual }

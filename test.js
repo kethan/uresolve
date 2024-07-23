@@ -1,5 +1,5 @@
 import assert from "assert";
-import { resolve } from "./src/index.js";
+import { resolve, virtual } from "./src/index.js";
 function test(message, callback) {
   try {
     callback();
@@ -148,12 +148,12 @@ test('should apply the converter if provided', async () => {
   });
 });
 
-
-const context = {
-  isContext: true
-}
-
 test('simple resolver', async () => {
+
+  const context = {
+    isContext: true
+  }
+
   const userResolver = resolve({
     password: async () => undefined,
 
@@ -178,7 +178,7 @@ test('simple resolver', async () => {
   })
 })
 
-test('simple resolver with virtual', async () => {
+test('simple resolver with virtual properties', async () => {
   const userResolver = resolve({
     password: async () => undefined,
     name: (async (_, user, ctx) => {
@@ -190,8 +190,7 @@ test('simple resolver with virtual', async () => {
     {
       firstName: 'Dave',
       lastName: 'L.'
-    },
-    context
+    }
   )
 
   assert.deepStrictEqual(u, {
@@ -212,7 +211,7 @@ test('simple resolver with converter', async () => {
       }),
     })
 
-  const u = await userConverterResolver.resolve({}, context)
+  const u = await userConverterResolver.resolve({})
 
   assert.deepStrictEqual(u, {
     firstName: 'Default',
@@ -265,3 +264,126 @@ test('empty resolver returns original data', async () => {
   const resolved = await resolver.resolve(data, {})
   assert.strictEqual(data, resolved)
 });
+
+test('nested resolver with array and context', async () => {
+  const countryResolver = resolve({
+    name: async (value) => value,
+    population: async (value) => value,
+    flag: async (value) => value,
+  }, {
+    converter: async (data) => ({
+      name: data.toUpperCase(),
+      population: 1000000,
+      flag: `https://example.com/flags/${data.toLowerCase()}.png`,
+    }),
+  });
+
+  const addressResolver = resolve({
+    street: async (value) => value.toUpperCase(),
+    city: async (value) => value.toUpperCase(),
+    state: async (value) => value.toUpperCase(),
+    country: countryResolver.resolve,
+  });
+
+  const userResolver = resolve({
+    name: async (value) => value.toUpperCase(),
+    age: async (value) => value * 2,
+    address: addressResolver.resolve,
+    eligable: async (_, user, ctx) => ctx.isEligible(user),
+    isDrinkingAge: virtual((value) => value.age > 18)
+  });
+
+  const data = {
+    name: 'John Doe',
+    age: 20,
+    address: {
+      street: 'Main Street',
+      city: 'New York',
+      state: 'New York',
+      country: 'us',
+    },
+  };
+
+  const context = {
+    isEligible: (value) => value.age > 20,
+  };
+
+  const resolvedData = await userResolver.resolve(data, context);
+
+  assert.deepStrictEqual(resolvedData, {
+    name: 'JOHN DOE',
+    age: 40,
+    eligable: false,
+    isDrinkingAge: true,
+    address: {
+      street: 'MAIN STREET',
+      city: 'NEW YORK',
+      state: 'NEW YORK',
+      country: {
+        name: 'US',
+        population: 1000000,
+        flag: 'https://example.com/flags/us.png',
+      },
+    },
+  });
+
+  const datas = [
+    {
+      name: 'John Doe',
+      age: 20,
+      address: {
+        street: 'Main Street',
+        city: 'New York',
+        state: 'New York',
+        country: 'us',
+      },
+    },
+    {
+      name: 'Jane Doe',
+      age: 30,
+      address: {
+        street: 'New Street',
+        city: 'Bangalore',
+        state: 'Karnataka',
+        country: 'in',
+      },
+    },
+  ];
+
+  const resolvedDatas = await userResolver.resolve(datas, context);
+
+  assert.deepStrictEqual(resolvedDatas, [
+    {
+      name: 'JOHN DOE',
+      age: 40,
+      eligable: false,
+      isDrinkingAge: true,
+      address: {
+        street: 'MAIN STREET',
+        city: 'NEW YORK',
+        state: 'NEW YORK',
+        country: {
+          name: 'US',
+          population: 1000000,
+          flag: 'https://example.com/flags/us.png',
+        },
+      },
+    },
+    {
+      name: 'JANE DOE',
+      age: 60,
+      eligable: true,
+      isDrinkingAge: true,
+      address: {
+        street: 'NEW STREET',
+        city: 'BANGALORE',
+        state: 'KARNATAKA',
+        country: {
+          name: 'IN',
+          population: 1000000,
+          flag: 'https://example.com/flags/in.png',
+        },
+      },
+    },
+  ]);
+})

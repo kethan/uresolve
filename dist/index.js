@@ -41,4 +41,6 @@ const resolve = (resolvers, options = {}) => ({
   }
 });
 
-export { resolve };
+const virtual = (resolver) => (_, obj, context) => resolver(obj, context);
+
+export { resolve, virtual };

@@ -21,7 +21,7 @@ The `resolve` function is a utility designed to process and resolve fields of an
 To use the `resolve` function in your project, simply import it from your module:
 
 ```javascript
-import { resolve } from 'uresolver';
+import { resolve, virtual } from 'uresolver';
 ```
 
 ## Usage
@@ -76,6 +76,8 @@ const resolvers = {
     city: async (value) => value.toUpperCase()
   }).resolve
 };
+
+const resolver = resolve(resolvers);
 
 const data = { name: 'Bob', address: { city: 'san francisco' } };
 
@@ -138,6 +140,52 @@ resolver.resolve({ name: 'Dave' }, {}).catch((err) => {
 });
 ```
 
+### Using Virtual Fields
+
+The `virtual` utility allows you to define fields that are computed dynamically based on other fields in the object or additional context.
+
+#### Example
+
+```javascript
+const virtual = (resolver) => async (value, obj, context) => {
+  return resolver(obj, context);
+};
+
+const userResolver = resolve({
+  isDrinkingAge: virtual(async (user, context) => {
+    const drinkingAge = await context.getDrinkingAge(user.country);
+    return user.age >= drinkingAge;
+  }),
+  fullName: virtual((user, context) => {
+    return `${user.firstName} ${user.lastName}`;
+  }),
+});
+
+const context = {
+  getDrinkingAge: async (country) => {
+    const drinkingAges = {
+      USA: 21,
+      UK: 18,
+      France: 18,
+      Germany: 16,
+    };
+    return drinkingAges[country] || 18;
+  },
+};
+
+const data = {
+  firstName: 'John',
+  lastName: 'Doe',
+  age: 20,
+  country: 'USA',
+};
+
+userResolver.resolve(data, context).then((resolved) => {
+  console.log(resolved); 
+  // Output: { isDrinkingAge: false, fullName: 'John Doe' }
+});
+```
+
 ## API
 
 ### `resolve(resolvers, options)`
@@ -158,6 +206,15 @@ An object with a `resolve` method.
 
 #### Returns
 A Promise that resolves to the transformed object or array of objects.
+
+### `virtual(resolver)`
+
+#### Parameters
+- `obj` (Object|Array): The object or array of objects to resolve.
+- `context` (Object): An optional context object passed to resolver functions.
+
+#### Returns
+A function that can be used as a resolver in the resolve function.
 
 ## Example
 
