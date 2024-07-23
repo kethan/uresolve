@@ -17,9 +17,7 @@ const resolve = (resolvers, options = {}) => ({
     const processResolver = async (resolverObj) => {
       const errors = {};
       let resolvedFields = {};
-
       resolverObj = await (options.converter ? options.converter(resolverObj, context) : resolverObj);
-
       const fieldsToResolve = new Set([...Object.keys(resolverObj), ...Object.keys(resolvers)]);
 
       await Promise.all(

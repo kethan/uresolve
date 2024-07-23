@@ -58,7 +58,7 @@ resolve({
     }
   )
   .then(console.log)
-  .catch((e) => console.log("wow!!", e));
+  .catch(console.error);
 
 
 const resolvers = {

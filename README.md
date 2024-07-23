@@ -1,10 +1,22 @@
-# Resolve Function
+# UResolver
+
+## JSON resolver
+
+[![Version](https://img.shields.io/npm/v/uresolver.svg?color=success&style=flat-square)](https://www.npmjs.com/package/uresolver) [![Badge size](https://img.badgesize.io/https://unpkg.com/uresolver?compression=brotli&label=brotli&style=flat-square)](https://unpkg.com/uresolver) [![Badge size](https://img.badgesize.io/https://unpkg.com/uresolver?compression=gzip&label=gzip&style=flat-square)](https://unpkg.com/uresolver)
 
 ## Overview
 
 The `resolve` function is a utility designed to process and resolve fields of an object or an array of objects. It allows you to define custom resolvers for specific fields and provides an option to convert objects before resolving them. This function is useful for transforming data structures in a flexible and modular way.
 
 ## Installation
+
+**yarn**: `yarn add uresolver`
+
+**npm**: `npm i uresolver`
+
+**cdn**: https://unpkg.com/uresolver
+
+**module**: https://unpkg.com/uresolver?module
 
 To use the `resolve` function in your project, simply import it from your module:
 

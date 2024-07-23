@@ -30,4 +30,4 @@ const resolve = (pkg, input = "src/index", output = "dist/index") => ({
 	]
 });
 
-export default resolve("uresolve");
+export default resolve("uresolver");

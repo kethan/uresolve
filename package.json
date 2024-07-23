@@ -1,7 +1,7 @@
 {
 	"name": "uresolver",
 	"description": "json resolver",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"type": "module",
 	"source": "./src/index.js",
 	"main": "./dist/index.cjs",
@@ -31,6 +31,7 @@
 	"keywords": [
 		"resolve",
 		"resolver",
+		"uresolver",
 		"uresolve",
 		"json",
 		"promise",
