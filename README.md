@@ -9,7 +9,7 @@ The `resolve` function is a utility designed to process and resolve fields of an
 To use the `resolve` function in your project, simply import it from your module:
 
 ```javascript
-import { resolve } from 'uresolve';
+import { resolve } from 'uresolver';
 ```
 
 ## Usage

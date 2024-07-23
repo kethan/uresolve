@@ -1,7 +1,7 @@
 {
-	"name": "uresolve",
+	"name": "uresolver",
 	"description": "json resolver",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"type": "module",
 	"source": "./src/index.js",
 	"main": "./dist/index.cjs",
